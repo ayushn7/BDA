@@ -1,0 +1,37 @@
+
+# Decision Tree Classification
+
+library("rpart") # Load libraries
+library("rpart.plot")
+
+setwd('E:\\College Files\\MSC.IT PART 1 SEM 2\\PRACTICAL CODES\\Big Data Analytics\\06 - Decision Tree\\Data Sets')
+getwd()
+
+# Read the Data
+play_decision <- read.table("weather-data.csv", header=TRUE, sep=",")
+play_decision
+View(play_decision)
+summary(play_decision)
+
+# Build the decision tree
+fit <- rpart(Play ~ Outlook + Temperature + Humidity + Wind,
+             method="class",
+             data=play_decision,
+             control=rpart.control(minsplit=1),
+             parms=list(split='information'))
+summary(fit)
+
+# Plot the tree
+?rpart.plot
+rpart.plot(fit, type=4, extra=1)
+rpart.plot(fit, type=4, extra=1)
+rpart.plot(fit, type=4, extra=2, clip.right.labs=FALSE,
+           varlen=0, faclen=0)
+
+# Predict
+newdata <- data.frame(Outlook="rainy", Temperature="mild",
+                      Humidity="high", Wind=FALSE)
+newdata
+
+predict(fit,newdata=newdata,type="prob")
+predict(fit,newdata=newdata,type="class")

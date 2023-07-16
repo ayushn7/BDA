@@ -1,0 +1,229 @@
+# Practical 1 : Installing Hadoop on Ubuntu(Basic)
+# Prerequisites : An Ubuntu server VM with a user having sudo privileges
+==================================================================================================
+
+# Check existing users on ubuntu
+cut -d: -f1 /etc/passwd
+
+# If user is present, then remove hadoop user from the system
+sudo deluser hduser
+
+# ps aux | grep 
+sudo killall -TERM -u hduser
+
+# Remove hadoop group
+sudo deluser --group hadoop
+
+# Check presence of hadoop by going to the location "/usr/local/"
+# If you see a hadoop folder, then hadoop installation was attempted and needs to be removed before fresh installation
+
+# Remove hadoop
+sudo rm -r -f /usr/local/hadoop/
+
+# Removing JDK
+sudo apt purge openjdk-8-*
+sudo apt purge openjdk-11-*
+
+==================================================================================================
+
+Step 1 — Installing Java
+Step 2 — Installing Hadoop
+Step 3 — Configuring Hadoop
+Step 4 — Running Hadoop
+
+==================================================================================================
+Step 1 — Installing Java
+==================================================================================================
+
+# To get started, first of all, we’ll update our package list
+sudo apt update
+ 
+# Next, we’ll install OpenJDK, the default Java Development Kit on Ubuntu 20.04 i.e., jdk 11
+# But for hive, we should install jdk 8 version.
+sudo apt install default-jdk         # Default version
+sudo apt-get install openjdk-8-jdk   # Suitable version for hive  
+
+# Check folder for java installation at location - 
+# Java path - "/usr/lib/jvm/java-11-openjdk-amd64"
+
+# Once the installation is complete, let’s check the version.
+java -version
+
+This output verifies that OpenJDK has been successfully installed.
+
+==================================================================================================
+
+# Add newuser to new usergroup
+# group-hadoop, user - hduser
+sudo addgroup hadoop
+sudo adduser --ingroup hadoop hduser
+
+# Add new user to listed groups
+sudo usermod -aG sudo hduser
+
+# Change to new user
+su hduser
+
+# The prompt shoud look like this - hduser@ubuntu:/
+
+==================================================================================================
+ 
+# Create a ssh keygen for the user
+ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 0600 ~/.ssh/authorized_keys
+
+# Disable IPv6.
+sudo nano /etc/sysctl.conf
+
+# Add the following lines to the end of the file
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+
+==================================================================================================
+Step 2 — Downloading & Installing Hadoop
+==================================================================================================
+
+# Extract Hadoop and move to group hadoop
+cd /usr/local
+
+sudo tar xvf /home/vivekn7/Downloads/hadoop-3.2.3.tar.gz 
+sudo mv hadoop-3.2.3 hadoop
+sudo chown -R hduser: hadoop hadoop
+===========================================================================
+
+# Now open $HOME/.bashrc 
+sudo nano $HOME/.bashrc
+
+# Add the following lines
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export HADOOP_HOME=/usr/local/hadoop
+export PATH=$PATH:$HADOOP_HOME/bin
+
+# Save file: Ctrl + S
+# Close file: Ctrl + X
+
+# Run the following command to make changes through the .bashrc file.
+source ~/.bashrc
+
+# Check version of java and hadoop
+java -version
+hadoop version
+
+===========================================================================
+
+# Create a tmp folder in /app/hadoop/tmp and change the owner to hduser.
+sudo mkdir -p /app/hadoop/tmp
+sudo chown hduser:hadoop /app/hadoop/tmp/
+
+===================================================================================================
+Step 3 — Configuring Hadoop
+===================================================================================================
+
+# Hadoop requires that you set the path to Java, either as an environment variable 
+# Or in the Hadoop configuration file.hadoop-env.sh
+cd /usr/local/hadoop/etc/hadoop/
+
+# To Configure Hadoop’s Java Home, begin by opening hadoop-env.sh
+sudo nano hadoop-env.sh
+
+# Add the following line at the end of .sh file
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+# Save & Close
+
+===========================================================================
+
+# Make the changes in core-site.xml file
+cd /usr/local/hadoop/etc/hadoop
+sudo nano core-site.xml
+
+# Add the following lines
+<property>
+	<name>hadoop.tmp.dir</name>
+	<value>/app/hadoop/tmp</value>
+	<description>A base for other temporarary directories</description>
+</property>
+
+<property>
+	<name>fs.default.name</name>
+	<value>hdfs://localhost:54310</value>
+	<description>The name of the default file system.</description>
+</property>
+
+# Save & Close
+
+===========================================================================
+
+#Make the changes in mapred-site.xml
+sudo nano mapred-site.xml
+
+#Add the following lines
+<property>
+	<name>mapred.job.tracker</name>
+	<value>localhost:54311</value>
+	<description>The host and port that the MapReduce job tracker runs
+		at. If "local", then jobs are run in-process as a single map
+		and reduce task.
+	</description>
+</property>
+
+# Save & Close
+
+===========================================================================
+
+# Make the changes in hdfs-site.xml
+sudo nano hdfs-site.xml
+
+# Add the following lines
+<property>
+            <name>dfs.namenode.name.dir</name>
+            <value>/app/hadoop/tmp/dfsdata/namenode</value>
+    </property>
+
+    <property>
+            <name>dfs.datanode.data.dir</name>
+            <value>/app/hadoop/tmp/dfsdata/datanode</value>
+    </property>
+
+<property>
+	<name>dfs.replication</name>
+	<value>1</value>
+	<description>Default block replication.
+		     The actual number of replications can be specified when the file is created. The default is used if replication is not specified in create time.
+	</description>
+	
+</property>
+
+# Save & Close
+
+===========================================================================
+
+# Format Namenode & Datanode
+hdfs namenode -format
+hdfs datanode -format
+
+===================================================================================================
+# Step 4 - Running Hadoop
+===================================================================================================
+
+# To start hadoop, we need to start localhost
+ssh localhost
+
+# If connection is refused, it will result in error. Run only if error & then run previous command
+sudo apt-get install ssh
+
+# Start all the hadoop services
+/usr/local/hadoop/sbin/start-all.sh
+
+# Check if that all hadoop services are running (6 services should appear)
+jps
+
+# Access localhost:9870 to get namenode status, open browser and type
+http://localhost:9870
+
+# Stop all the hadoop services
+/usr/local/hadoop/sbin/stop-all.sh
+
+===================================================================================================

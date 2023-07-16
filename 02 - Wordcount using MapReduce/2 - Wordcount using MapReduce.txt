@@ -1,0 +1,53 @@
+Practical 1 : Implement Wordcount using MAPREDUCE
+==================================================================================================
+
+# 1. Login to hadoop user if not already logged in
+su hduser
+
+# Start hadoop services
+ssh localhost
+/usr/local/hadoop/sbin/start-all.sh
+jps
+
+# Start localhost on browser
+http://localhost:9870
+
+# 2. Create a text file with some words at local file system 
+# Note: Necessary to include same and repeated words in bda.txt & then Save and Close
+cd /home/hduser
+sudo nano bda.txt
+sudo chown hduser:hadoop /home/hduser/bda.txt
+
+# 3. Move bda.txt file to HDFS
+hdfs dfs -put /home/hduser/bda.txt /
+
+# 4. Running MapReduce for wordcount file bda.txt
+hadoop jar /usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.2.3.jar wordcount /bda.txt /output
+
+# 5. Check output at default output location
+hdfs dfs -head /output/part-r-00000
+
+# 6. To get output in a .txt file in HDFS
+hdfs dfs -mv /output/part-r-00000 /output/opt.txt
+
+# 7. To check the file system in HDFS
+hdfs dfs -ls /
+
+==================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

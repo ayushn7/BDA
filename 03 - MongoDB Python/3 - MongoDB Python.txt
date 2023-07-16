@@ -1,0 +1,90 @@
+
+# Step 1 : # Install mongodb by executing the installation file "mongodb-windows-x86_64-4.4.6-signed"
+           # click next, next and finish the installation
+
+# Step2 : Launch MongoDB
+# Navigate to the following location : "C:\Program Files\MongoDB\Server\4.4\bin"
+
+#Start mongo daemon - 
+mongod
+
+#start mongo service - 
+mongo
+
+# Creating Collections and Documents
+
+A MongoDB database is a physical container for collections of documents. Each database gets its own set of files on the file system. These files are managed by the MongoDB server, which can handle several databases.
+
+In MongoDB, a collection is a group of documents. Collections are somewhat analogous to tables in a traditional RDBMS, but without imposing a rigid schema. In theory, each document in a collection can have a completely different structure or set of fields.
+
+
+# Show list of db
+show dbs
+
+# Show current db
+db
+
+# create/switch to a db - use dbname
+use udit
+
+# display existing collections
+show collections;
+
+# create collection - db.collectionname
+db.subjects
+
+#insert into collection
+db.subjects.insert({"name":"bda"})
+db.subjects.insert({"name":"mn"})
+db.subjects.insert({"name":"ip"})
+db.subjects.insert({"name":"msa"})
+show collections;
+
+# Display all records in collection
+db.subjects.find();
+
+# Display specific record in colleciton
+db.subjects.find({"name": "bda"});
+
+# Using MongoDB With Python and PyMongo
+# Install python 3.7.4
+# Launch IDLE 3.7
+
+
+# Installing PyMongo
+# MongoDB provides an official Python driver called PyMongo.
+python -m pip install pymongo
+
+# start a Python interactive session and run the following import:
+import pymongo
+
+#Working With Databases, Collections
+# Program 1: Creating a Database
+from pymongo import MongoClient              
+myclient = MongoClient()                                    //create a client object to communicate with running MongoDB instance
+myclient				                    //test client
+
+#to provide a custom host and port when you need to provide a host and port that differ from MongoDB’s default
+myclient = MongoClient(host="localhost", port=27017)
+
+# chk db list
+print(myclient.list_database_names())
+
+#define which database you want to use
+db = myclient["udit"]
+
+
+# Progam 2: Creating a Collection
+import pymongo
+myclient = MongoClient(host="localhost", port=27017)
+db = myclient.IT
+col=db.subjects1                                                                 
+dict = {"name":"ds", "sem":"1"}	               
+x=col.insert_one(dict) 
+dict = {"name":"cc", "sem":"1"}	               
+x=col.insert_one(dict) 
+dict = {"name":"ric", "sem":"1"}	               
+x=col.insert_one(dict) 
+dict = {"name":"sct", "sem":"1"}	               
+x=col.insert_one(dict)                                                  
+print(client1.list_database_names())

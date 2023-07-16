@@ -1,0 +1,26 @@
+# Clustering Algorithms
+
+# 1. Open & Read Iris Data Set
+iris
+View(iris)
+
+newiris = iris
+newiris
+summary(newiris)
+View(newiris)
+
+newiris$Species = NULL
+View(newiris)
+
+# 2. Apply kmeans to newiris, and Store the clustering result in kc. 
+# 3. The cluster number is set to 3.
+kc = kmeans(newiris,3)
+kc
+
+table(iris$Species, kc$cluster)
+
+# 4. Plot the clusters and their centers
+plot(newiris[c("Sepal.Length", "Sepal.Width")], col=kc$cluster)
+
+# 5. Mark the cluster centers
+points(kc$centers[,c("Sepal.Length", "Sepal.Width")], col=1:3, pch=6, cex=2)
